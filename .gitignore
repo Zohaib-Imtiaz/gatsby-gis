@@ -1,5 +1,8 @@
 .DS_Store
 
+.env
+.env.development
+
 node_modules/
 .cache/
 public
