@@ -1,8 +1,11 @@
 import * as React from "react";
+import { createRoot } from "react-dom/client";
 import mapboxgl, {
   AnyLayer,
   AnySourceData,
   GeoJSONSourceOptions,
+  Map,
+  MapboxGeoJSONFeature,
   Source,
 } from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
@@ -18,14 +21,38 @@ interface MapboxReactProps {
     source: GeoJSONSourceOptions["data"] | null;
     layer?: Omit<AnyLayer, "id">;
   }[];
+  interactiveLayerIds?: string[];
+  popup?: {
+    show: true | false;
+    component: (data: MapboxGeoJSONFeature[] | undefined) => JSX.Element;
+  };
 }
 
-function MapboxReact({ sources }: MapboxReactProps) {
+function addPopup(reactNode: JSX.Element | undefined, lngLat: mapboxgl.LngLat) {
+  const popupUINode = document.createElement("div");
+  popupUINode.setAttribute("id", "map-popup");
+  const popupUIRootElement = createRoot(popupUINode);
+  popupUIRootElement.render(reactNode ?? <h1>NO UI</h1>);
+
+  const marker = new mapboxgl.Popup()
+    .setDOMContent(popupUINode)
+    .setLngLat(lngLat);
+
+  return marker;
+}
+
+function MapboxReact({
+  sources,
+  interactiveLayerIds,
+  popup,
+}: MapboxReactProps) {
   const mapContainer = useRef(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
   const [zoom, setZoom] = useState(9);
+
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
 
   useEffect(() => {
     if (map.current) {
@@ -45,7 +72,6 @@ function MapboxReact({ sources }: MapboxReactProps) {
       })
     );
   }, []);
-  console.log("HELLO", sources);
 
   const addSources = React.useCallback(() => {
     if (map.current === null) {
@@ -68,30 +94,43 @@ function MapboxReact({ sources }: MapboxReactProps) {
           if (source.layer) {
             const layerSource = map.current.getLayer(source.id);
             if (layerSource) {
-              console.log('Layer Already exists')
-            } else {
-              map.current.addLayer({
-                ...source.layer,
-                id: source.id,
-                source: source.id,
-              } as AnyLayer);
+              console.log("Layer Already exists");
+              map.current.removeLayer(source.id);
             }
+            map.current.addLayer({
+              ...source.layer,
+              id: source.id,
+              source: source.id,
+            } as AnyLayer);
           }
         }
       }
     }
   }, [sources]);
 
+  const addControls = React.useCallback(() => {
+    if (map.current === null || interactiveLayerIds === undefined) return;
+    map.current.on("click", interactiveLayerIds as string[], (e) => {
+      if (popup?.show) {
+        if (popupRef.current === null) {
+          popupRef.current = addPopup(
+            popup?.component(e.features),
+            e.lngLat
+          ).addTo(map.current as Map);
+        } else {
+          popupRef.current.remove();
+          popupRef.current = null;
+        }
+      }
+    });
+  }, []);
+
   useEffect(() => {
     if (map.current && map.current.loaded() && sources && sources?.length > 0) {
       addSources();
+      addControls();
     }
   }, [addSources]);
-
-  console.log(
-    map.current?.getLayer("countries"),
-    map.current?.getSource("countries")
-  );
 
   return (
     <div>

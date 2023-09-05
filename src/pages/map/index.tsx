@@ -59,6 +59,14 @@ const MapPage = () => {
               },
             ]
       }
+      interactiveLayerIds={['countries']}
+      popup={{
+        show:true,
+        component(data) {
+          console.log(data)
+          return <h1>TESTING</h1>
+        },
+      }}
     />
   );
 };
