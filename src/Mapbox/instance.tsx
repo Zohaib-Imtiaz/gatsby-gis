@@ -1,10 +1,8 @@
 import * as React from "react";
-import { createRoot } from "react-dom/client";
 import mapboxgl, {
   AnyLayer,
-  AnySourceData,
   GeoJSONSourceOptions,
-  Map,
+  LngLatLike,
   MapboxGeoJSONFeature,
   Source,
 } from "mapbox-gl";
@@ -14,6 +12,7 @@ import "./map.css";
 
 mapboxgl.accessToken = process.env.GATSBY_MAPBOX_ACCESS_TOKEN as string;
 
+export const MapContext = React.createContext<mapboxgl.Map | null>(null);
 interface MapboxReactProps {
   sources?: {
     id: string;
@@ -22,39 +21,24 @@ interface MapboxReactProps {
     layer?: Omit<AnyLayer, "id">;
   }[];
   interactiveLayerIds?: string[];
-  popup?: {
-    show: true | false;
-    component: JSX.Element;
-  };
-  onClick?: (data: MapboxGeoJSONFeature[] | undefined) => void;
-}
-
-function addPopup(reactNode: JSX.Element | undefined, lngLat: mapboxgl.LngLat) {
-  const popupUINode = document.createElement("div");
-  popupUINode.setAttribute("id", "map-popup");
-  const popupUIRootElement = createRoot(popupUINode);
-  popupUIRootElement.render(reactNode ?? <h1>NO UI</h1>);
-
-  const marker = new mapboxgl.Popup()
-    .setDOMContent(popupUINode)
-    .setLngLat(lngLat);
-
-  return marker;
+  onClick?: (
+    data: MapboxGeoJSONFeature[] | undefined,
+    lngLat: LngLatLike
+  ) => void;
+  children?: React.ReactNode;
 }
 
 function MapboxReact({
   sources,
   interactiveLayerIds,
-  popup,
   onClick,
+  children,
 }: MapboxReactProps) {
   const mapContainer = useRef(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
   const [zoom, setZoom] = useState(9);
-
-  const popupRef = useRef<mapboxgl.Popup | null>(null);
 
   useEffect(() => {
     if (map.current) {
@@ -113,18 +97,7 @@ function MapboxReact({
   const addControls = React.useCallback(() => {
     if (map.current === null || interactiveLayerIds === undefined) return;
     map.current.on("click", interactiveLayerIds as string[], (e) => {
-      if (onClick) onClick(e.features);
-      if (popup?.show) {
-        if (popupRef.current === null) {
-          popupRef.current = addPopup(
-            popup?.component,
-            e.lngLat
-          ).addTo(map.current as Map);
-        } else {
-          popupRef.current.remove();
-          popupRef.current = null;
-        }
-      }
+      if (onClick) onClick(e.features, e.lngLat);
     });
   }, []);
 
@@ -136,8 +109,8 @@ function MapboxReact({
   }, [addSources]);
 
   return (
-    <div>
-      <div ref={mapContainer} className="map-container" />
+    <div ref={mapContainer} className="map-container">
+      <MapContext.Provider value={map.current}>{children}</MapContext.Provider>
     </div>
   );
 }
