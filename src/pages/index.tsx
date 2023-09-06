@@ -8,7 +8,11 @@ import {
 import CountryPopUp from "../components/MapPopup/CountryPopUp";
 import Popup from "../Mapbox/mapComponents/Popup";
 import { LngLatLike } from "mapbox-gl";
-import { ShapeLoader, WordLoader } from "../components/Loader/Loader";
+import {
+  ShapeLoader,
+  WordColorChangeLoader,
+  WordLoader,
+} from "../components/Loader/Loader";
 
 const supabase = createClient(
   process.env.GATSBY_SUPABASE_URL as string,
@@ -166,13 +170,20 @@ const MapPage = () => {
             padding: "10px",
             borderRadius: "12px",
             backgroundColor: "#ffffff",
-            opacity: '0.5',
-            top: '10px',
-            left: '10px'
+            opacity: "0.5",
+            top: "10px",
+            left: "10px",
           }}
         >
-          <div style={{ display: "flex" }}>
-            <ShapeLoader /> <WordLoader />
+          <div
+            style={{
+              display: "flex",
+              gap: "24px",
+              alignItems: "center",
+              padding: "12px",
+            }}
+          >
+            <ShapeLoader /> <WordColorChangeLoader />
           </div>
         </div>
       )}

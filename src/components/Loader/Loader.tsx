@@ -6,5 +6,9 @@ export const ShapeLoader = () => {
 };
 
 export const WordLoader = () => {
-    return <div className="word_loader" />
-}
+  return <div className="word_loader" />;
+};
+
+export const WordColorChangeLoader = () => {
+  return <div className="color_changing_word_loader" />;
+};
