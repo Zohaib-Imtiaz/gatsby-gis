@@ -1,7 +1,10 @@
 import * as React from "react";
 import MapboxReact from "../../Mapbox/instance";
 import { createClient } from "@supabase/supabase-js";
-import { countriesPolygonClustersLayer } from "../../Mapbox/layers/mapPageLayers";
+import {
+  countriesPolygonClustersLayer,
+  selectedCountryPolygonClustersLayer,
+} from "../../Mapbox/layers/mapPageLayers";
 
 const supabase = createClient(
   process.env.GATSBY_SUPABASE_URL as string,
@@ -11,6 +14,9 @@ const supabase = createClient(
 const MapPage = () => {
   const [countriesBoundries, setCountiesBoundries] = React.useState<
     FeatureCollection | undefined
+  >(undefined);
+  const [selectedCountryISO3, setSelectedCountryISO3] = React.useState<
+    string | undefined
   >(undefined);
   const [dataLoading, setDataLoading] = React.useState(true);
 
@@ -45,6 +51,27 @@ const MapPage = () => {
     fetchFromDB();
   }, []);
 
+  const updateSelectedCountry = React.useCallback(
+    (data: mapboxgl.MapboxGeoJSONFeature[]) => {
+      setSelectedCountryISO3(data[0].properties?.iso3);
+    },
+    []
+  );
+
+  const selectedCountry = React.useMemo(() => {
+    const selectedFeature = countriesBoundries?.features.find(
+      (feat) => feat.properties.iso3 === selectedCountryISO3
+    );
+    console.log(selectedCountryISO3, selectedFeature, countriesBoundries);
+    if (selectedFeature) {
+      return {
+        type: "FeatureCollection",
+        features: [selectedFeature],
+      } as FeatureCollection;
+    }
+    return undefined;
+  }, [selectedCountryISO3]);
+
   return (
     <MapboxReact
       sources={
@@ -57,15 +84,24 @@ const MapPage = () => {
                 source: countriesBoundries,
                 layer: countriesPolygonClustersLayer,
               },
+              {
+                id: "selected_country",
+                type: "geojson",
+                source: selectedCountry,
+                layer: selectedCountryPolygonClustersLayer,
+              },
             ]
       }
-      interactiveLayerIds={['countries']}
+      interactiveLayerIds={["countries"]}
+      onClick={(data) => {
+        updateSelectedCountry(data as mapboxgl.MapboxGeoJSONFeature[]);
+      }}
       popup={{
-        show:true,
-        component(data) {
-          console.log(data)
-          return <h1>TESTING</h1>
-        },
+        show: true,
+        component: (() => {
+          console.log(selectedCountry);
+          return <h1>TESTING</h1>;
+        })(),
       }}
     />
   );

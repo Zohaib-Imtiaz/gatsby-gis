@@ -24,8 +24,9 @@ interface MapboxReactProps {
   interactiveLayerIds?: string[];
   popup?: {
     show: true | false;
-    component: (data: MapboxGeoJSONFeature[] | undefined) => JSX.Element;
+    component: JSX.Element;
   };
+  onClick?: (data: MapboxGeoJSONFeature[] | undefined) => void;
 }
 
 function addPopup(reactNode: JSX.Element | undefined, lngLat: mapboxgl.LngLat) {
@@ -45,6 +46,7 @@ function MapboxReact({
   sources,
   interactiveLayerIds,
   popup,
+  onClick,
 }: MapboxReactProps) {
   const mapContainer = useRef(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -111,10 +113,11 @@ function MapboxReact({
   const addControls = React.useCallback(() => {
     if (map.current === null || interactiveLayerIds === undefined) return;
     map.current.on("click", interactiveLayerIds as string[], (e) => {
+      if (onClick) onClick(e.features);
       if (popup?.show) {
         if (popupRef.current === null) {
           popupRef.current = addPopup(
-            popup?.component(e.features),
+            popup?.component,
             e.lngLat
           ).addTo(map.current as Map);
         } else {
