@@ -1,0 +1,9 @@
+.field{
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.space_between {
+    display: flex;
+    justify-content: space-between;
+}

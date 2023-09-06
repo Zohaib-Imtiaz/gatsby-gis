@@ -1,7 +1,6 @@
 import mapboxgl from "mapbox-gl";
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { createRoot } from "react-dom/client";
 import { MapContext } from "../instance";
 
 interface PopupProps {
@@ -15,14 +14,15 @@ const Popup = React.memo(({ show, lngLat, children, onClose }: PopupProps) => {
   const Map = React.useContext(MapContext);
 
   const container = React.useMemo(() => {
-    return document.createElement("div");
+    const element = document.createElement("div");
+    element.className = "mapbox_popup";
+    return element;
   }, []);
 
   const popup = React.useMemo(() => {
     return new mapboxgl.Popup();
   }, []);
 
-  console.log("LNGLAT ===>", lngLat, Map);
   React.useEffect(() => {
     if (Map === undefined || Map === null) {
       console.error("PopUp can only be used under MapboxReact");

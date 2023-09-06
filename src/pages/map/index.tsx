@@ -5,9 +5,10 @@ import {
   countriesPolygonClustersLayer,
   selectedCountryPolygonClustersLayer,
 } from "../../Mapbox/layers/mapPageLayers";
-import CountryPopUp from "../../components/CountryPopUp";
+import CountryPopUp from "../../components/MapPopup/CountryPopUp";
 import Popup from "../../Mapbox/mapComponents/Popup";
 import { LngLatLike } from "mapbox-gl";
+import { ShapeLoader, WordLoader } from "../../components/Loader/Loader";
 
 const supabase = createClient(
   process.env.GATSBY_SUPABASE_URL as string,
@@ -26,14 +27,19 @@ const MapPage = () => {
   const [overviewData, setOverviewData] = React.useState<
     { Value: any; Indicator: { title: any; units: any }[] }[] | null
   >(null);
+  const [overviewDataFetchLoading, setOverviewDataFetchLoading] =
+    React.useState(true);
 
   console.log("BOUNDRIES===>", countriesBoundries);
 
   const fetchFromDB = React.useCallback(async () => {
     try {
-      let { data, error } = await supabase.rpc("get_boundries_with_name", {
-        take: 250,
-      });
+      let { data, error } = await supabase.rpc(
+        "get_boundries_with_name_currency",
+        {
+          take: 250,
+        }
+      );
       if (error) throw error;
 
       const features: Feature[] = [];
@@ -41,7 +47,11 @@ const MapPage = () => {
         features.push({
           type: "Feature",
           geometry: JSON.parse(element.geojson),
-          properties: { iso3: element.iso3, name: element.name },
+          properties: {
+            iso3: element.iso3,
+            name: element.name,
+            currency_code: element.currency_code,
+          },
         });
       }
       setCountiesBoundries({
@@ -60,6 +70,7 @@ const MapPage = () => {
 
   const updateSelectedCountry = React.useCallback(
     (data: mapboxgl.MapboxGeoJSONFeature[], position: LngLatLike) => {
+      setOverviewDataFetchLoading(true);
       setSelectedCountryISO3(data[0].properties?.iso3);
       setLngLat(position);
     },
@@ -81,11 +92,9 @@ const MapPage = () => {
   }, [selectedCountryISO3]);
 
   const popUp = React.useCallback(() => {
-    console.log(
-      "FUNCTION===>",
-      overviewData,
-      selectedCountry?.features[0].properties
-    );
+    if (overviewDataFetchLoading) {
+      return <WordLoader />;
+    }
     return (
       <CountryPopUp
         overview={overviewData as any}
@@ -98,22 +107,20 @@ const MapPage = () => {
     if (selectedCountryISO3) {
       let { data: economic_outlook, error } = await supabase
         .from("economic_outlook")
-        .select("Value, Indicator (title, units)")
+        .select("Value, Indicator (id, title, units)")
 
         // Filters
         .eq("Country", selectedCountryISO3)
         .eq("Year", 2020)
         .or("Indicator.eq.BCA,Indicator.eq.GGXWDG,Indicator.eq.NGDPDPC");
-      console.log(economic_outlook, error);
       setOverviewData(economic_outlook);
+      setOverviewDataFetchLoading(false);
     }
   }, [selectedCountryISO3]);
 
   React.useEffect(() => {
     getSelectedCountryEconomicData();
   }, [getSelectedCountryEconomicData]);
-
-  console.log('INDEX LNGLAT,', lngLat)
 
   return (
     <MapboxReact
@@ -137,10 +144,13 @@ const MapPage = () => {
       }
       interactiveLayerIds={["countries"]}
       onClick={(data, position) => {
-        updateSelectedCountry(data as mapboxgl.MapboxGeoJSONFeature[], position);
+        updateSelectedCountry(
+          data as mapboxgl.MapboxGeoJSONFeature[],
+          position
+        );
       }}
     >
-      <Popup show={true} lngLat={lngLat?? undefined}>
+      <Popup show={true} lngLat={lngLat ?? undefined}>
         {popUp()}
       </Popup>
     </MapboxReact>

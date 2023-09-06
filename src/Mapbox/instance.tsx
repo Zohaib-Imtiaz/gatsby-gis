@@ -80,7 +80,6 @@ function MapboxReact({
           if (source.layer) {
             const layerSource = map.current.getLayer(source.id);
             if (layerSource) {
-              console.log("Layer Already exists");
               map.current.removeLayer(source.id);
             }
             map.current.addLayer({

@@ -1,3 +1,16 @@
 .map-container {
     height: 100vh;
 }
+
+.mapbox_popup {
+    border-radius: 12px;
+}
+
+.mapboxgl-popup-content {
+    border-radius: 12px;
+}
+
+.mapboxgl-popup-close-button {
+    right: 4px;
+    top: 4px
+}
