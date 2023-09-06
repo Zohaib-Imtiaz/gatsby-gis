@@ -18,8 +18,8 @@ const supabase = createClient(
 const MapPage = () => {
   if (typeof window === "undefined") {
     // Code that uses `document` or browser-specific APIs
-    console.log('OK')
-    return <></>
+    console.log("OK");
+    return <></>;
   }
   const [countriesBoundries, setCountiesBoundries] = React.useState<
     FeatureCollection | undefined
@@ -158,6 +158,24 @@ const MapPage = () => {
       <Popup show={true} lngLat={lngLat ?? undefined}>
         {popUp()}
       </Popup>
+      {dataLoading && (
+        <div
+          style={{
+            position: "absolute",
+            zIndex: 1,
+            padding: "10px",
+            borderRadius: "12px",
+            backgroundColor: "#ffffff",
+            opacity: '0.5',
+            top: '10px',
+            left: '10px'
+          }}
+        >
+          <div style={{ display: "flex" }}>
+            <ShapeLoader /> <WordLoader />
+          </div>
+        </div>
+      )}
     </MapboxReact>
   );
 };

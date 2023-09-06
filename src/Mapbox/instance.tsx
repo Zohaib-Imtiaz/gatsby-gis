@@ -36,9 +36,9 @@ function MapboxReact({
 }: MapboxReactProps) {
   const mapContainer = useRef(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [lng, setLng] = useState(-70.9);
-  const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [lng, setLng] = useState(-98.70342031250559);
+  const [lat, setLat] = useState(38.62817840885373);
+  const [zoom, setZoom] = useState(4);
 
   useEffect(() => {
     if (map.current) {
