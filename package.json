@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "gis",
+  "homepage": "https://zohaib-imtiaz.github.io/GIS-Mapbox",
   "author": "MUHAMMAD ZOHAIB IMTIAZ",
   "keywords": [
     "gatsby"
@@ -13,7 +14,14 @@
     "build": "gatsby build",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "pre-deploy": "git remote set-url origin git@github.com:Zohaib-Imtiaz/GIS-Mapbox.github.io.git",
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public",
+    "publish": "gh-pages -d public",
+    "post-deploy": "git remote set-url origin git@github.com:Zohaib-Imtiaz/gatsby-gis.git",
+    "portfolio-live-repo": "git remote set-url origin git@github.com:Zohaib-Imtiaz/GIS-Mapbox.git",
+    "portfolio-dev-repo": "git remote set-url origin git@github.com:Zohaib-Imtiaz/gatsby-gis.git",
+    "show-origin": "git remote show origin"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.33.1",
@@ -27,6 +35,7 @@
     "@types/node": "^20.3.3",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
+    "gh-pages": "^6.0.0",
     "typescript": "^5.1.6"
   }
 }
