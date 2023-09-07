@@ -78,3 +78,22 @@
     content:"Loading..."
   }
   @keyframes l7 {to{background-position: left}}
+
+
+  .mapdata_loading_container {
+    position: absolute;
+    z-index: 1;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    opacity: 0.5;
+    top: 10px;
+    left: 10px;
+}
+
+.align_items_with_gap {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    padding: 12px;
+}

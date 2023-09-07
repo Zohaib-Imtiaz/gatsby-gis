@@ -9,6 +9,7 @@ import CountryPopUp from "../components/MapPopup/CountryPopUp";
 import Popup from "../Mapbox/mapComponents/Popup";
 import { LngLatLike } from "mapbox-gl";
 import {
+  MapDataLoader,
   ShapeLoader,
   WordColorChangeLoader,
   WordLoader,
@@ -162,31 +163,21 @@ const MapPage = () => {
       <Popup show={true} lngLat={lngLat ?? undefined}>
         {popUp()}
       </Popup>
-      {dataLoading && (
-        <div
-          style={{
-            position: "absolute",
-            zIndex: 1,
-            padding: "10px",
-            borderRadius: "12px",
-            backgroundColor: "#ffffff",
-            opacity: "0.5",
-            top: "10px",
-            left: "10px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "24px",
-              alignItems: "center",
-              padding: "12px",
-            }}
-          >
-            <ShapeLoader /> <WordColorChangeLoader />
-          </div>
-        </div>
-      )}
+      {dataLoading && <MapDataLoader />}
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 1,
+          padding: "10px",
+          borderRadius: "12px",
+          backgroundColor: "#ffffff",
+          opacity: "0.5",
+          top: "10px",
+          left: "40%",
+        }}
+      >
+        <h1>IMF World Economic Outlook Data</h1>
+      </div>
     </MapboxReact>
   );
 };

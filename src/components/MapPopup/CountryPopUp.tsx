@@ -4,7 +4,8 @@ import {
   keysOfCurrencyAndUnit,
 } from "../../constants/currencyAndUnit";
 import { currency } from "../../utils/intl";
-import * as classes from './CountryPopUp.module.css';
+import * as classes from "./CountryPopUp.module.css";
+import { SimpleToolTip } from "../Tooltip/Tooltip";
 
 interface CountryPopUpProps {
   overview:
@@ -40,7 +41,11 @@ const CountryPopUp = ({ overview, properties }: CountryPopUpProps) => {
           return (
             <React.Fragment key={element?.Value}>
               <div className={classes.space_between}>
-                <span className={classes.field}>{element?.Indicator.id}: </span>
+                <SimpleToolTip tooltip={`${element?.Indicator.title} in ${element?.Indicator.units}`}>
+                  <span className={classes.field}>
+                    {element?.Indicator.id}:{" "}
+                  </span>
+                </SimpleToolTip>
                 <span>
                   {displayValue(element?.Indicator.units, element?.Value)}
                 </span>
