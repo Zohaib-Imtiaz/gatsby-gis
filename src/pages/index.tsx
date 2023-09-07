@@ -8,12 +8,7 @@ import {
 import CountryPopUp from "../components/MapPopup/CountryPopUp";
 import Popup from "../Mapbox/mapComponents/Popup";
 import { LngLatLike } from "mapbox-gl";
-import {
-  MapDataLoader,
-  ShapeLoader,
-  WordColorChangeLoader,
-  WordLoader,
-} from "../components/Loader/Loader";
+import { MapDataLoader, WordLoader } from "../components/Loader/Loader";
 
 const supabase = createClient(
   process.env.GATSBY_SUPABASE_URL as string,
@@ -122,7 +117,7 @@ const MapPage = () => {
         // Filters
         .eq("Country", selectedCountryISO3)
         .eq("Year", 2020)
-        .or("Indicator.eq.BCA,Indicator.eq.GGXWDG,Indicator.eq.NGDPDPC");
+        // .or("Indicator.eq.BCA,Indicator.eq.GGXWDG,Indicator.eq.NGDPDPC");
       setOverviewData(economic_outlook);
       setOverviewDataFetchLoading(false);
     }
@@ -173,10 +168,15 @@ const MapPage = () => {
           backgroundColor: "#ffffff",
           opacity: "0.5",
           top: "10px",
-          left: "40%",
+          left: "35%",
         }}
       >
-        <h1>IMF World Economic Outlook Data</h1>
+        <h1 style={{margin: 0}}>IMF World Economic Outlook Data</h1>
+        <div
+          style={{ display: "flex", justifyContent: "center" }}
+        >
+          <h3 style={{margin: "8px 0px 0px 0px"}}>up to 2020</h3>
+        </div>
       </div>
     </MapboxReact>
   );

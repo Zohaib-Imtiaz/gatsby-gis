@@ -36,12 +36,21 @@ const CountryPopUp = ({ overview, properties }: CountryPopUpProps) => {
   return (
     <div>
       <h2>{properties?.name}</h2>
-      <div>
+      <div className={classes.popup_container}>
         {overview?.map((element) => {
           return (
             <React.Fragment key={element?.Value}>
               <div className={classes.space_between}>
-                <SimpleToolTip tooltip={`${element?.Indicator.title} in ${element?.Indicator.units}`}>
+                <SimpleToolTip
+                  tooltip={
+                    <>
+                      <h3 className={classes.tooltip_heading}>{element?.Indicator.id}</h3>
+                      <span>
+                        {element?.Indicator.title} in {element?.Indicator.units}
+                      </span>
+                    </>
+                  }
+                >
                   <span className={classes.field}>
                     {element?.Indicator.id}:{" "}
                   </span>
